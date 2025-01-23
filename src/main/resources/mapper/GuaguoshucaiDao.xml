@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.GuaguoshucaiDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.guaguoshucai_name as guaguoshucaiName
+        ,a.guaguoshucai_uuid_number as guaguoshucaiUuidNumber
+        ,a.guaguoshucai_photo as guaguoshucaiPhoto
+        ,a.guaguoshucai_types as guaguoshucaiTypes
+        ,a.guaguoshucai_clicknum as guaguoshucaiClicknum
+        ,a.guaguoshucai_content as guaguoshucaiContent
+        ,a.shangxia_types as shangxiaTypes
+        ,a.guaguoshucai_delete as guaguoshucaiDelete
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.GuaguoshucaiView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+
+        FROM guaguoshucai  a
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test=" params.guaguoshucaiName != '' and params.guaguoshucaiName != null and params.guaguoshucaiName != 'null' ">
+                and a.guaguoshucai_name like CONCAT('%',#{params.guaguoshucaiName},'%')
+            </if>
+            <if test=" params.guaguoshucaiUuidNumber != '' and params.guaguoshucaiUuidNumber != null and params.guaguoshucaiUuidNumber != 'null' ">
+                and a.guaguoshucai_uuid_number like CONCAT('%',#{params.guaguoshucaiUuidNumber},'%')
+            </if>
+            <if test="params.guaguoshucaiTypes != null and params.guaguoshucaiTypes != ''">
+                and a.guaguoshucai_types = #{params.guaguoshucaiTypes}
+            </if>
+            <if test="params.guaguoshucaiClicknumStart != null and params.guaguoshucaiClicknumStart != ''">
+                <![CDATA[  and a.guaguoshucai_clicknum >= #{params.guaguoshucaiClicknumStart}   ]]>
+            </if>
+            <if test="params.guaguoshucaiClicknumEnd != null and params.guaguoshucaiClicknumEnd != ''">
+                <![CDATA[  and a.guaguoshucai_clicknum <= #{params.guaguoshucaiClicknumEnd}   ]]>
+            </if>
+             <if test="params.guaguoshucaiClicknum != null and params.guaguoshucaiClicknum != ''">
+                and a.guaguoshucai_clicknum = #{params.guaguoshucaiClicknum}
+             </if>
+            <if test=" params.guaguoshucaiContent != '' and params.guaguoshucaiContent != null and params.guaguoshucaiContent != 'null' ">
+                and a.guaguoshucai_content like CONCAT('%',#{params.guaguoshucaiContent},'%')
+            </if>
+            <if test="params.shangxiaTypes != null and params.shangxiaTypes != ''">
+                and a.shangxia_types = #{params.shangxiaTypes}
+            </if>
+            <if test="params.guaguoshucaiDeleteStart != null and params.guaguoshucaiDeleteStart != ''">
+                <![CDATA[  and a.guaguoshucai_delete >= #{params.guaguoshucaiDeleteStart}   ]]>
+            </if>
+            <if test="params.guaguoshucaiDeleteEnd != null and params.guaguoshucaiDeleteEnd != ''">
+                <![CDATA[  and a.guaguoshucai_delete <= #{params.guaguoshucaiDeleteEnd}   ]]>
+            </if>
+             <if test="params.guaguoshucaiDelete != null and params.guaguoshucaiDelete != ''">
+                and a.guaguoshucai_delete = #{params.guaguoshucaiDelete}
+             </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>

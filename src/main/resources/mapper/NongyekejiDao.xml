@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.NongyekejiDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.nongyekeji_name as nongyekejiName
+        ,a.nongyekeji_uuid_number as nongyekejiUuidNumber
+        ,a.nongyekeji_photo as nongyekejiPhoto
+        ,a.nongyekeji_types as nongyekejiTypes
+        ,a.yanfa_time as yanfaTime
+        ,a.nongyekeji_clicknum as nongyekejiClicknum
+        ,a.nongyekeji_gongxiao as nongyekejiGongxiao
+        ,a.nongyekeji_content as nongyekejiContent
+        ,a.shangxia_types as shangxiaTypes
+        ,a.nongyekeji_delete as nongyekejiDelete
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.NongyekejiView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+
+        FROM nongyekeji  a
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test=" params.nongyekejiName != '' and params.nongyekejiName != null and params.nongyekejiName != 'null' ">
+                and a.nongyekeji_name like CONCAT('%',#{params.nongyekejiName},'%')
+            </if>
+            <if test=" params.nongyekejiUuidNumber != '' and params.nongyekejiUuidNumber != null and params.nongyekejiUuidNumber != 'null' ">
+                and a.nongyekeji_uuid_number like CONCAT('%',#{params.nongyekejiUuidNumber},'%')
+            </if>
+            <if test="params.nongyekejiTypes != null and params.nongyekejiTypes != ''">
+                and a.nongyekeji_types = #{params.nongyekejiTypes}
+            </if>
+            <if test=" params.yanfaTimeStart != '' and params.yanfaTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.yanfa_time) >= UNIX_TIMESTAMP(#{params.yanfaTimeStart}) ]]>
+            </if>
+            <if test=" params.yanfaTimeEnd != '' and params.yanfaTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.yanfa_time) <= UNIX_TIMESTAMP(#{params.yanfaTimeEnd}) ]]>
+            </if>
+            <if test="params.nongyekejiClicknumStart != null and params.nongyekejiClicknumStart != ''">
+                <![CDATA[  and a.nongyekeji_clicknum >= #{params.nongyekejiClicknumStart}   ]]>
+            </if>
+            <if test="params.nongyekejiClicknumEnd != null and params.nongyekejiClicknumEnd != ''">
+                <![CDATA[  and a.nongyekeji_clicknum <= #{params.nongyekejiClicknumEnd}   ]]>
+            </if>
+             <if test="params.nongyekejiClicknum != null and params.nongyekejiClicknum != ''">
+                and a.nongyekeji_clicknum = #{params.nongyekejiClicknum}
+             </if>
+            <if test=" params.nongyekejiGongxiao != '' and params.nongyekejiGongxiao != null and params.nongyekejiGongxiao != 'null' ">
+                and a.nongyekeji_gongxiao like CONCAT('%',#{params.nongyekejiGongxiao},'%')
+            </if>
+            <if test=" params.nongyekejiContent != '' and params.nongyekejiContent != null and params.nongyekejiContent != 'null' ">
+                and a.nongyekeji_content like CONCAT('%',#{params.nongyekejiContent},'%')
+            </if>
+            <if test="params.shangxiaTypes != null and params.shangxiaTypes != ''">
+                and a.shangxia_types = #{params.shangxiaTypes}
+            </if>
+            <if test="params.nongyekejiDeleteStart != null and params.nongyekejiDeleteStart != ''">
+                <![CDATA[  and a.nongyekeji_delete >= #{params.nongyekejiDeleteStart}   ]]>
+            </if>
+            <if test="params.nongyekejiDeleteEnd != null and params.nongyekejiDeleteEnd != ''">
+                <![CDATA[  and a.nongyekeji_delete <= #{params.nongyekejiDeleteEnd}   ]]>
+            </if>
+             <if test="params.nongyekejiDelete != null and params.nongyekejiDelete != ''">
+                and a.nongyekeji_delete = #{params.nongyekejiDelete}
+             </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>

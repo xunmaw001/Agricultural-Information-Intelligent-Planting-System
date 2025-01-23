@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.ChuqinyangzhiCollectionDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.chuqinyangzhi_id as chuqinyangzhiId
+        ,a.yonghu_id as yonghuId
+        ,a.chuqinyangzhi_collection_types as chuqinyangzhiCollectionTypes
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.ChuqinyangzhiCollectionView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+        ,chuqinyangzhi.chuqinyangzhi_name as chuqinyangzhiName
+        ,chuqinyangzhi.chuqinyangzhi_uuid_number as chuqinyangzhiUuidNumber
+        ,chuqinyangzhi.chuqinyangzhi_photo as chuqinyangzhiPhoto
+        ,chuqinyangzhi.chuqinyangzhi_types as chuqinyangzhiTypes
+        ,chuqinyangzhi.chuqinyangzhi_clicknum as chuqinyangzhiClicknum
+        ,chuqinyangzhi.chuqinyangzhi_content as chuqinyangzhiContent
+        ,chuqinyangzhi.shangxia_types as shangxiaTypes
+        ,chuqinyangzhi.chuqinyangzhi_delete as chuqinyangzhiDelete
+        ,yonghu.yonghu_name as yonghuName
+        ,yonghu.yonghu_phone as yonghuPhone
+        ,yonghu.yonghu_id_number as yonghuIdNumber
+        ,yonghu.yonghu_photo as yonghuPhoto
+        ,yonghu.yonghu_email as yonghuEmail
+
+        FROM chuqinyangzhi_collection  a
+        left JOIN chuqinyangzhi chuqinyangzhi ON a.chuqinyangzhi_id = chuqinyangzhi.id
+        left JOIN yonghu yonghu ON a.yonghu_id = yonghu.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.chuqinyangzhiId != null and params.chuqinyangzhiId != ''">
+                and (
+                    a.chuqinyangzhi_id = #{params.chuqinyangzhiId}
+                )
+            </if>
+            <if test="params.yonghuId != null and params.yonghuId != ''">
+                and (
+                    a.yonghu_id = #{params.yonghuId}
+                )
+            </if>
+            <if test="params.chuqinyangzhiCollectionTypes != null and params.chuqinyangzhiCollectionTypes != ''">
+                and a.chuqinyangzhi_collection_types = #{params.chuqinyangzhiCollectionTypes}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+
+                <!-- 判断畜禽养殖的id不为空 -->
+            <if test=" params.chuqinyangzhiIdNotNull != '' and params.chuqinyangzhiIdNotNull != null and params.chuqinyangzhiIdNotNull != 'null' ">
+                and a.chuqinyangzhi_id IS NOT NULL
+            </if>
+            <if test=" params.chuqinyangzhiName != '' and params.chuqinyangzhiName != null and params.chuqinyangzhiName != 'null' ">
+                and chuqinyangzhi.chuqinyangzhi_name like CONCAT('%',#{params.chuqinyangzhiName},'%')
+            </if>
+            <if test=" params.chuqinyangzhiUuidNumber != '' and params.chuqinyangzhiUuidNumber != null and params.chuqinyangzhiUuidNumber != 'null' ">
+                and chuqinyangzhi.chuqinyangzhi_uuid_number like CONCAT('%',#{params.chuqinyangzhiUuidNumber},'%')
+            </if>
+            <if test="params.chuqinyangzhiTypes != null  and params.chuqinyangzhiTypes != ''">
+                and chuqinyangzhi.chuqinyangzhi_types = #{params.chuqinyangzhiTypes}
+            </if>
+
+            <if test="params.chuqinyangzhiClicknumStart != null  and params.chuqinyangzhiClicknumStart != '' ">
+                <![CDATA[  and chuqinyangzhi.chuqinyangzhi_clicknum >= #{params.chuqinyangzhiClicknumStart}   ]]>
+            </if>
+            <if test="params.chuqinyangzhiClicknumEnd != null  and params.chuqinyangzhiClicknumEnd != '' ">
+                <![CDATA[  and chuqinyangzhi.chuqinyangzhi_clicknum <= #{params.chuqinyangzhiClicknumEnd}   ]]>
+            </if>
+            <if test="params.chuqinyangzhiClicknum != null  and params.chuqinyangzhiClicknum != '' ">
+                and chuqinyangzhi.chuqinyangzhi_clicknum = #{params.chuqinyangzhiClicknum}
+            </if>
+            <if test=" params.chuqinyangzhiContent != '' and params.chuqinyangzhiContent != null and params.chuqinyangzhiContent != 'null' ">
+                and chuqinyangzhi.chuqinyangzhi_content like CONCAT('%',#{params.chuqinyangzhiContent},'%')
+            </if>
+            <if test="params.shangxiaTypes != null  and params.shangxiaTypes != ''">
+                and chuqinyangzhi.shangxia_types = #{params.shangxiaTypes}
+            </if>
+
+            <if test="params.chuqinyangzhiDeleteStart != null  and params.chuqinyangzhiDeleteStart != '' ">
+                <![CDATA[  and chuqinyangzhi.chuqinyangzhi_delete >= #{params.chuqinyangzhiDeleteStart}   ]]>
+            </if>
+            <if test="params.chuqinyangzhiDeleteEnd != null  and params.chuqinyangzhiDeleteEnd != '' ">
+                <![CDATA[  and chuqinyangzhi.chuqinyangzhi_delete <= #{params.chuqinyangzhiDeleteEnd}   ]]>
+            </if>
+            <if test="params.chuqinyangzhiDelete != null  and params.chuqinyangzhiDelete != '' ">
+                and chuqinyangzhi.chuqinyangzhi_delete = #{params.chuqinyangzhiDelete}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(chuqinyangzhi.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(chuqinyangzhi.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+                <!-- 判断用户的id不为空 -->
+            <if test=" params.yonghuIdNotNull != '' and params.yonghuIdNotNull != null and params.yonghuIdNotNull != 'null' ">
+                and a.yonghu_id IS NOT NULL
+            </if>
+            <if test=" params.yonghuName != '' and params.yonghuName != null and params.yonghuName != 'null' ">
+                and yonghu.yonghu_name like CONCAT('%',#{params.yonghuName},'%')
+            </if>
+            <if test=" params.yonghuPhone != '' and params.yonghuPhone != null and params.yonghuPhone != 'null' ">
+                and yonghu.yonghu_phone like CONCAT('%',#{params.yonghuPhone},'%')
+            </if>
+            <if test=" params.yonghuIdNumber != '' and params.yonghuIdNumber != null and params.yonghuIdNumber != 'null' ">
+                and yonghu.yonghu_id_number like CONCAT('%',#{params.yonghuIdNumber},'%')
+            </if>
+            <if test=" params.yonghuEmail != '' and params.yonghuEmail != null and params.yonghuEmail != 'null' ">
+                and yonghu.yonghu_email like CONCAT('%',#{params.yonghuEmail},'%')
+            </if>
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>

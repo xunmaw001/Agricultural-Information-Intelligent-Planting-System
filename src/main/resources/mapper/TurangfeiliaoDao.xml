@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.TurangfeiliaoDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.turangfeiliao_name as turangfeiliaoName
+        ,a.turangfeiliao_uuid_number as turangfeiliaoUuidNumber
+        ,a.turangfeiliao_photo as turangfeiliaoPhoto
+        ,a.turangfeiliao_types as turangfeiliaoTypes
+        ,a.turangfeiliao_clicknum as turangfeiliaoClicknum
+        ,a.turangfeiliao_content as turangfeiliaoContent
+        ,a.shangxia_types as shangxiaTypes
+        ,a.turangfeiliao_delete as turangfeiliaoDelete
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.TurangfeiliaoView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+
+        FROM turangfeiliao  a
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test=" params.turangfeiliaoName != '' and params.turangfeiliaoName != null and params.turangfeiliaoName != 'null' ">
+                and a.turangfeiliao_name like CONCAT('%',#{params.turangfeiliaoName},'%')
+            </if>
+            <if test=" params.turangfeiliaoUuidNumber != '' and params.turangfeiliaoUuidNumber != null and params.turangfeiliaoUuidNumber != 'null' ">
+                and a.turangfeiliao_uuid_number like CONCAT('%',#{params.turangfeiliaoUuidNumber},'%')
+            </if>
+            <if test="params.turangfeiliaoTypes != null and params.turangfeiliaoTypes != ''">
+                and a.turangfeiliao_types = #{params.turangfeiliaoTypes}
+            </if>
+            <if test="params.turangfeiliaoClicknumStart != null and params.turangfeiliaoClicknumStart != ''">
+                <![CDATA[  and a.turangfeiliao_clicknum >= #{params.turangfeiliaoClicknumStart}   ]]>
+            </if>
+            <if test="params.turangfeiliaoClicknumEnd != null and params.turangfeiliaoClicknumEnd != ''">
+                <![CDATA[  and a.turangfeiliao_clicknum <= #{params.turangfeiliaoClicknumEnd}   ]]>
+            </if>
+             <if test="params.turangfeiliaoClicknum != null and params.turangfeiliaoClicknum != ''">
+                and a.turangfeiliao_clicknum = #{params.turangfeiliaoClicknum}
+             </if>
+            <if test=" params.turangfeiliaoContent != '' and params.turangfeiliaoContent != null and params.turangfeiliaoContent != 'null' ">
+                and a.turangfeiliao_content like CONCAT('%',#{params.turangfeiliaoContent},'%')
+            </if>
+            <if test="params.shangxiaTypes != null and params.shangxiaTypes != ''">
+                and a.shangxia_types = #{params.shangxiaTypes}
+            </if>
+            <if test="params.turangfeiliaoDeleteStart != null and params.turangfeiliaoDeleteStart != ''">
+                <![CDATA[  and a.turangfeiliao_delete >= #{params.turangfeiliaoDeleteStart}   ]]>
+            </if>
+            <if test="params.turangfeiliaoDeleteEnd != null and params.turangfeiliaoDeleteEnd != ''">
+                <![CDATA[  and a.turangfeiliao_delete <= #{params.turangfeiliaoDeleteEnd}   ]]>
+            </if>
+             <if test="params.turangfeiliaoDelete != null and params.turangfeiliaoDelete != ''">
+                and a.turangfeiliao_delete = #{params.turangfeiliaoDelete}
+             </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>

@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.TurangfeiliaoLiuyanDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.turangfeiliao_id as turangfeiliaoId
+        ,a.yonghu_id as yonghuId
+        ,a.turangfeiliao_liuyan_text as turangfeiliaoLiuyanText
+        ,a.insert_time as insertTime
+        ,a.reply_text as replyText
+        ,a.update_time as updateTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.TurangfeiliaoLiuyanView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+        ,turangfeiliao.turangfeiliao_name as turangfeiliaoName
+        ,turangfeiliao.turangfeiliao_uuid_number as turangfeiliaoUuidNumber
+        ,turangfeiliao.turangfeiliao_photo as turangfeiliaoPhoto
+        ,turangfeiliao.turangfeiliao_types as turangfeiliaoTypes
+        ,turangfeiliao.turangfeiliao_clicknum as turangfeiliaoClicknum
+        ,turangfeiliao.turangfeiliao_content as turangfeiliaoContent
+        ,turangfeiliao.shangxia_types as shangxiaTypes
+        ,turangfeiliao.turangfeiliao_delete as turangfeiliaoDelete
+        ,yonghu.yonghu_name as yonghuName
+        ,yonghu.yonghu_phone as yonghuPhone
+        ,yonghu.yonghu_id_number as yonghuIdNumber
+        ,yonghu.yonghu_photo as yonghuPhoto
+        ,yonghu.yonghu_email as yonghuEmail
+
+        FROM turangfeiliao_liuyan  a
+        left JOIN turangfeiliao turangfeiliao ON a.turangfeiliao_id = turangfeiliao.id
+        left JOIN yonghu yonghu ON a.yonghu_id = yonghu.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.turangfeiliaoId != null and params.turangfeiliaoId != ''">
+                and (
+                    a.turangfeiliao_id = #{params.turangfeiliaoId}
+                )
+            </if>
+            <if test="params.yonghuId != null and params.yonghuId != ''">
+                and (
+                    a.yonghu_id = #{params.yonghuId}
+                )
+            </if>
+            <if test=" params.turangfeiliaoLiuyanText != '' and params.turangfeiliaoLiuyanText != null and params.turangfeiliaoLiuyanText != 'null' ">
+                and a.turangfeiliao_liuyan_text like CONCAT('%',#{params.turangfeiliaoLiuyanText},'%')
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test=" params.replyText != '' and params.replyText != null and params.replyText != 'null' ">
+                and a.reply_text like CONCAT('%',#{params.replyText},'%')
+            </if>
+            <if test=" params.updateTimeStart != '' and params.updateTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.update_time) >= UNIX_TIMESTAMP(#{params.updateTimeStart}) ]]>
+            </if>
+            <if test=" params.updateTimeEnd != '' and params.updateTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.update_time) <= UNIX_TIMESTAMP(#{params.updateTimeEnd}) ]]>
+            </if>
+
+                <!-- 判断土壤肥料的id不为空 -->
+            <if test=" params.turangfeiliaoIdNotNull != '' and params.turangfeiliaoIdNotNull != null and params.turangfeiliaoIdNotNull != 'null' ">
+                and a.turangfeiliao_id IS NOT NULL
+            </if>
+            <if test=" params.turangfeiliaoName != '' and params.turangfeiliaoName != null and params.turangfeiliaoName != 'null' ">
+                and turangfeiliao.turangfeiliao_name like CONCAT('%',#{params.turangfeiliaoName},'%')
+            </if>
+            <if test=" params.turangfeiliaoUuidNumber != '' and params.turangfeiliaoUuidNumber != null and params.turangfeiliaoUuidNumber != 'null' ">
+                and turangfeiliao.turangfeiliao_uuid_number like CONCAT('%',#{params.turangfeiliaoUuidNumber},'%')
+            </if>
+            <if test="params.turangfeiliaoTypes != null  and params.turangfeiliaoTypes != ''">
+                and turangfeiliao.turangfeiliao_types = #{params.turangfeiliaoTypes}
+            </if>
+
+            <if test="params.turangfeiliaoClicknumStart != null  and params.turangfeiliaoClicknumStart != '' ">
+                <![CDATA[  and turangfeiliao.turangfeiliao_clicknum >= #{params.turangfeiliaoClicknumStart}   ]]>
+            </if>
+            <if test="params.turangfeiliaoClicknumEnd != null  and params.turangfeiliaoClicknumEnd != '' ">
+                <![CDATA[  and turangfeiliao.turangfeiliao_clicknum <= #{params.turangfeiliaoClicknumEnd}   ]]>
+            </if>
+            <if test="params.turangfeiliaoClicknum != null  and params.turangfeiliaoClicknum != '' ">
+                and turangfeiliao.turangfeiliao_clicknum = #{params.turangfeiliaoClicknum}
+            </if>
+            <if test=" params.turangfeiliaoContent != '' and params.turangfeiliaoContent != null and params.turangfeiliaoContent != 'null' ">
+                and turangfeiliao.turangfeiliao_content like CONCAT('%',#{params.turangfeiliaoContent},'%')
+            </if>
+            <if test="params.shangxiaTypes != null  and params.shangxiaTypes != ''">
+                and turangfeiliao.shangxia_types = #{params.shangxiaTypes}
+            </if>
+
+            <if test="params.turangfeiliaoDeleteStart != null  and params.turangfeiliaoDeleteStart != '' ">
+                <![CDATA[  and turangfeiliao.turangfeiliao_delete >= #{params.turangfeiliaoDeleteStart}   ]]>
+            </if>
+            <if test="params.turangfeiliaoDeleteEnd != null  and params.turangfeiliaoDeleteEnd != '' ">
+                <![CDATA[  and turangfeiliao.turangfeiliao_delete <= #{params.turangfeiliaoDeleteEnd}   ]]>
+            </if>
+            <if test="params.turangfeiliaoDelete != null  and params.turangfeiliaoDelete != '' ">
+                and turangfeiliao.turangfeiliao_delete = #{params.turangfeiliaoDelete}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(turangfeiliao.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(turangfeiliao.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+                <!-- 判断用户的id不为空 -->
+            <if test=" params.yonghuIdNotNull != '' and params.yonghuIdNotNull != null and params.yonghuIdNotNull != 'null' ">
+                and a.yonghu_id IS NOT NULL
+            </if>
+            <if test=" params.yonghuName != '' and params.yonghuName != null and params.yonghuName != 'null' ">
+                and yonghu.yonghu_name like CONCAT('%',#{params.yonghuName},'%')
+            </if>
+            <if test=" params.yonghuPhone != '' and params.yonghuPhone != null and params.yonghuPhone != 'null' ">
+                and yonghu.yonghu_phone like CONCAT('%',#{params.yonghuPhone},'%')
+            </if>
+            <if test=" params.yonghuIdNumber != '' and params.yonghuIdNumber != null and params.yonghuIdNumber != 'null' ">
+                and yonghu.yonghu_id_number like CONCAT('%',#{params.yonghuIdNumber},'%')
+            </if>
+            <if test=" params.yonghuEmail != '' and params.yonghuEmail != null and params.yonghuEmail != 'null' ">
+                and yonghu.yonghu_email like CONCAT('%',#{params.yonghuEmail},'%')
+            </if>
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>

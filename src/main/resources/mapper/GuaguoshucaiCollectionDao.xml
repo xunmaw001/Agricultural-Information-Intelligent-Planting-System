@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.GuaguoshucaiCollectionDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.guaguoshucai_id as guaguoshucaiId
+        ,a.yonghu_id as yonghuId
+        ,a.guaguoshucai_collection_types as guaguoshucaiCollectionTypes
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.GuaguoshucaiCollectionView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+        ,guaguoshucai.guaguoshucai_name as guaguoshucaiName
+        ,guaguoshucai.guaguoshucai_uuid_number as guaguoshucaiUuidNumber
+        ,guaguoshucai.guaguoshucai_photo as guaguoshucaiPhoto
+        ,guaguoshucai.guaguoshucai_types as guaguoshucaiTypes
+        ,guaguoshucai.guaguoshucai_clicknum as guaguoshucaiClicknum
+        ,guaguoshucai.guaguoshucai_content as guaguoshucaiContent
+        ,guaguoshucai.shangxia_types as shangxiaTypes
+        ,guaguoshucai.guaguoshucai_delete as guaguoshucaiDelete
+        ,yonghu.yonghu_name as yonghuName
+        ,yonghu.yonghu_phone as yonghuPhone
+        ,yonghu.yonghu_id_number as yonghuIdNumber
+        ,yonghu.yonghu_photo as yonghuPhoto
+        ,yonghu.yonghu_email as yonghuEmail
+
+        FROM guaguoshucai_collection  a
+        left JOIN guaguoshucai guaguoshucai ON a.guaguoshucai_id = guaguoshucai.id
+        left JOIN yonghu yonghu ON a.yonghu_id = yonghu.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.guaguoshucaiId != null and params.guaguoshucaiId != ''">
+                and (
+                    a.guaguoshucai_id = #{params.guaguoshucaiId}
+                )
+            </if>
+            <if test="params.yonghuId != null and params.yonghuId != ''">
+                and (
+                    a.yonghu_id = #{params.yonghuId}
+                )
+            </if>
+            <if test="params.guaguoshucaiCollectionTypes != null and params.guaguoshucaiCollectionTypes != ''">
+                and a.guaguoshucai_collection_types = #{params.guaguoshucaiCollectionTypes}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+
+                <!-- 判断瓜果蔬菜的id不为空 -->
+            <if test=" params.guaguoshucaiIdNotNull != '' and params.guaguoshucaiIdNotNull != null and params.guaguoshucaiIdNotNull != 'null' ">
+                and a.guaguoshucai_id IS NOT NULL
+            </if>
+            <if test=" params.guaguoshucaiName != '' and params.guaguoshucaiName != null and params.guaguoshucaiName != 'null' ">
+                and guaguoshucai.guaguoshucai_name like CONCAT('%',#{params.guaguoshucaiName},'%')
+            </if>
+            <if test=" params.guaguoshucaiUuidNumber != '' and params.guaguoshucaiUuidNumber != null and params.guaguoshucaiUuidNumber != 'null' ">
+                and guaguoshucai.guaguoshucai_uuid_number like CONCAT('%',#{params.guaguoshucaiUuidNumber},'%')
+            </if>
+            <if test="params.guaguoshucaiTypes != null  and params.guaguoshucaiTypes != ''">
+                and guaguoshucai.guaguoshucai_types = #{params.guaguoshucaiTypes}
+            </if>
+
+            <if test="params.guaguoshucaiClicknumStart != null  and params.guaguoshucaiClicknumStart != '' ">
+                <![CDATA[  and guaguoshucai.guaguoshucai_clicknum >= #{params.guaguoshucaiClicknumStart}   ]]>
+            </if>
+            <if test="params.guaguoshucaiClicknumEnd != null  and params.guaguoshucaiClicknumEnd != '' ">
+                <![CDATA[  and guaguoshucai.guaguoshucai_clicknum <= #{params.guaguoshucaiClicknumEnd}   ]]>
+            </if>
+            <if test="params.guaguoshucaiClicknum != null  and params.guaguoshucaiClicknum != '' ">
+                and guaguoshucai.guaguoshucai_clicknum = #{params.guaguoshucaiClicknum}
+            </if>
+            <if test=" params.guaguoshucaiContent != '' and params.guaguoshucaiContent != null and params.guaguoshucaiContent != 'null' ">
+                and guaguoshucai.guaguoshucai_content like CONCAT('%',#{params.guaguoshucaiContent},'%')
+            </if>
+            <if test="params.shangxiaTypes != null  and params.shangxiaTypes != ''">
+                and guaguoshucai.shangxia_types = #{params.shangxiaTypes}
+            </if>
+
+            <if test="params.guaguoshucaiDeleteStart != null  and params.guaguoshucaiDeleteStart != '' ">
+                <![CDATA[  and guaguoshucai.guaguoshucai_delete >= #{params.guaguoshucaiDeleteStart}   ]]>
+            </if>
+            <if test="params.guaguoshucaiDeleteEnd != null  and params.guaguoshucaiDeleteEnd != '' ">
+                <![CDATA[  and guaguoshucai.guaguoshucai_delete <= #{params.guaguoshucaiDeleteEnd}   ]]>
+            </if>
+            <if test="params.guaguoshucaiDelete != null  and params.guaguoshucaiDelete != '' ">
+                and guaguoshucai.guaguoshucai_delete = #{params.guaguoshucaiDelete}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(guaguoshucai.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(guaguoshucai.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+                <!-- 判断用户的id不为空 -->
+            <if test=" params.yonghuIdNotNull != '' and params.yonghuIdNotNull != null and params.yonghuIdNotNull != 'null' ">
+                and a.yonghu_id IS NOT NULL
+            </if>
+            <if test=" params.yonghuName != '' and params.yonghuName != null and params.yonghuName != 'null' ">
+                and yonghu.yonghu_name like CONCAT('%',#{params.yonghuName},'%')
+            </if>
+            <if test=" params.yonghuPhone != '' and params.yonghuPhone != null and params.yonghuPhone != 'null' ">
+                and yonghu.yonghu_phone like CONCAT('%',#{params.yonghuPhone},'%')
+            </if>
+            <if test=" params.yonghuIdNumber != '' and params.yonghuIdNumber != null and params.yonghuIdNumber != 'null' ">
+                and yonghu.yonghu_id_number like CONCAT('%',#{params.yonghuIdNumber},'%')
+            </if>
+            <if test=" params.yonghuEmail != '' and params.yonghuEmail != null and params.yonghuEmail != 'null' ">
+                and yonghu.yonghu_email like CONCAT('%',#{params.yonghuEmail},'%')
+            </if>
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>
